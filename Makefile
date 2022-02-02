@@ -3,3 +3,6 @@ build:
 
 run:
 	docker run -it -v $(PWD):/var/www/html -w /var/www/html  json-to-code/php sh
+
+test:
+	docker run -it -v $(PWD):/var/www/html -w /var/www/html  json-to-code/php ./vendor/bin/phpunit
