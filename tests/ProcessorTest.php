@@ -39,5 +39,22 @@ class ProcessorTest extends TestCase
             ']'
         ]);
         $this->assertSame($expected, (new Processor(json_decode($json, true)))->get());
+
+        $json = <<<EOF
+        [
+          {
+            "foo": "bar"
+          }
+        ]
+        EOF;
+
+        $expected = implode('\n', [
+            '[',
+            '    [',
+            '        \'foo\' => \'bar\'',
+            '    ]',
+            ']'
+        ]);
+        $this->assertSame($expected, (new Processor(json_decode($json, true)))->get());
     }
 }
