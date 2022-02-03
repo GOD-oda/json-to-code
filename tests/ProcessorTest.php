@@ -107,4 +107,26 @@ class ProcessorTest extends TestCase
         ]);
         $this->assertSame($expected, (new Processor(json_decode($json, true)))->get());
     }
+
+    public function testProcess6()
+    {
+        $json = <<<EOF
+        {
+          "foo": "foo",
+          "bar": {
+            "baz": "baz"
+          }
+        }
+        EOF;
+
+        $expected = implode('\n', [
+            "[",
+            "    'foo' => 'foo',",
+            "    'bar' => [",
+            "        'baz' => 'baz'",
+            "    ]",
+            "]"
+        ]);
+        $this->assertSame($expected, (new Processor(json_decode($json, true)))->get());
+    }
 }

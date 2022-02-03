@@ -15,7 +15,7 @@ class Processor
             if (is_string($k) && is_string($v)) {
                 Depth::inc();
                 $this->processedElementCount++;
-                if (count($text) !== $this->processedElementCount) {
+                if (count($text) > $this->processedElementCount) {
                     $this->contents[] = sprintf("%s'{$k}' => '{$v}',", Depth::space());
                 } else {
                     $this->contents[] = sprintf("%s'{$k}' => '{$v}'", Depth::space());
