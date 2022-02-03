@@ -5,49 +5,48 @@ namespace Gonzalezoda\JsonToCode;
 class Processor
 {
     protected array $contents = [];
+    protected int $processedElementCount = 0;
 
     public function __construct(protected array $text) {}
 
-    private function process(array $text, $crlf = false)
+    private function process(array $text)
     {
         foreach ($text as $k => $v) {
             if (is_string($k) && is_string($v)) {
-                if (!$crlf) {
-                    $this->contents[] = sprintf("%s[", Depth::space());
-                }
                 Depth::inc();
-                $this->contents[] = sprintf("%s'{$k}' => '{$v}'", Depth::space());
+                $this->processedElementCount++;
+                if (count($text) !== $this->processedElementCount) {
+                    $this->contents[] = sprintf("%s'{$k}' => '{$v}',", Depth::space());
+                } else {
+                    $this->contents[] = sprintf("%s'{$k}' => '{$v}'", Depth::space());
+                    $this->processedElementCount = 0;
+                }
                 Depth::dec();
-                if (!$crlf) {
-                    $this->contents[] = sprintf("%s]", Depth::space());
-                }
             } elseif (is_string($k) && is_array($v)) {
-                if (!$crlf) {
-                    $this->contents[] = sprintf("%s[", Depth::space());
-                }
                 Depth::inc();
                 $this->contents[] = sprintf("%s'{$k}' => [", Depth::space());
-                $this->process($v, true);
+                $this->process($v);
                 $this->contents[] = sprintf("%s]", Depth::space());
                 Depth::dec();
-                if (!$crlf) {
-                    $this->contents[] = sprintf("%s]", Depth::space());
-                }
             } elseif (is_int($k) && is_array($v)) {
-                $this->contents[] = sprintf("%s[", Depth::space());
                 Depth::inc();
                 $this->contents[] = sprintf("%s[", Depth::space());
-                $this->process($v, true);
-                $this->contents[] = sprintf("%s]", Depth::space());
+                $this->process($v);
+                if (isset($text[$k + 1])) {
+                    $this->contents[] = sprintf("%s],", Depth::space());
+                } else {
+                    $this->contents[] = sprintf("%s]", Depth::space());
+                }
                 Depth::dec();
-                $this->contents[] = sprintf("%s]", Depth::space());
             }
         }
     }
 
     public function get(): string
     {
+        $this->contents[] = '[';
         $this->process($this->text);
+        $this->contents[] = ']';
 
         return implode('\n', $this->contents);
     }
